@@ -4,19 +4,6 @@ import { getMappings } from './getMappings';
 import { resolveSCSS } from './resolveSCSS';
 import { escapeStringRegexp } from './escapeStringRegexp';
 
-export function activate(context: vscode.ExtensionContext) {
-  const provider = new CustomDocumentLinkProvider();
-  const selector: vscode.DocumentSelector = {
-    scheme: 'file',
-    language: 'scss',
-  };
-  const registration = vscode.languages.registerDocumentLinkProvider(
-    selector,
-    provider
-  );
-  context.subscriptions.push(registration);
-}
-
 export class CustomDocumentLinkProvider implements vscode.DocumentLinkProvider {
   async provideDocumentLinks(
     document: vscode.TextDocument
