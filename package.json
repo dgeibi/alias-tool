@@ -17,7 +17,9 @@
     "languages": [
       {
         "id": "scss",
-        "extensions": [".scss"]
+        "extensions": [
+          ".scss"
+        ]
       }
     ],
     "definitionProvider": [
@@ -37,7 +39,10 @@
       }
     }
   },
-
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/dgeibi/alias-tool"
+  },
   "scripts": {
     "vscode:prepublish": "pnpm run compile",
     "compile": "tsc -p ./",
