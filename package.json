@@ -2,7 +2,7 @@
   "name": "alias-tool",
   "displayName": "alias-tool",
   "description": "",
-  "version": "0.0.3",
+  "version": "0.1.0",
   "publisher": "dgeibi",
   "engines": {
     "vscode": "^1.78.0"
@@ -11,7 +11,11 @@
     "Other"
   ],
   "activationEvents": [
-    "onLanguage:scss"
+    "onLanguage:scss",
+    "onLanguage:typescript",
+    "onLanguage:javascript",
+    "onLanguage:typescriptreact",
+    "onLanguage:javascriptreact"
   ],
   "main": "./out/extension.js",
   "contributes": {
@@ -20,6 +24,30 @@
         "id": "scss",
         "extensions": [
           ".scss"
+        ]
+      },
+      {
+        "id": "javascript",
+        "extensions": [
+          ".js"
+        ]
+      },
+      {
+        "id": "javascriptreact",
+        "extensions": [
+          ".jsx"
+        ]
+      },
+      {
+        "id": "typescriptreact",
+        "extensions": [
+          ".tsx"
+        ]
+      },
+      {
+        "id": "typescript",
+        "extensions": [
+          ".ts"
         ]
       }
     ],

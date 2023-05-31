@@ -1,5 +1,5 @@
 import { URI, Utils } from 'vscode-uri';
-import * as vscode from 'vscode';
+import { fileExists } from './fileExists';
 
 function toPathVariations(target: string): string[] {
   // No variation for links that ends with suffix
@@ -27,18 +27,6 @@ function toPathVariations(target: string): string[] {
     target + '/_index.scss',
     Utils.joinPath(dirname, basename + '.css').toString(true),
   ];
-}
-
-async function fileExists(uri: string): Promise<boolean> {
-  try {
-    const stat = await vscode.workspace.fs.stat(URI.parse(uri));
-    if (stat.type === vscode.FileType.Unknown && stat.size === -1) {
-      return false;
-    }
-    return true;
-  } catch (err) {
-    return false;
-  }
 }
 
 export async function resolveSCSS(path: string) {

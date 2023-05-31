@@ -30,15 +30,14 @@ async function pushImportLinks(
   document: vscode.TextDocument,
   links: vscode.DocumentLink[]
 ) {
-  const regex = new RegExp(`@import\\s+['"]((${prefixs})\/.+?)['"]`, 'g');
+  const regex = new RegExp(`(@(?:import|use)\\s+)['"]((${prefixs})\/.+?)['"]`, 'g');
   let match: RegExpExecArray | null;
 
   while ((match = regex.exec(text)) !== null) {
-    const importPath = match[1].replace(/\?.*/, '');
-    const pre = match[2];
+    const importPath = match[2].replace(/\?.*/, '');
+    const pre = match[3];
     const target = map[pre];
-    const prefix = /@import\s+/.exec(match[0]);
-    const prefixLength = prefix && prefix[0] ? prefix && prefix[0].length : 0;
+    const prefixLength = match[1].length;
     const range = new vscode.Range(
       document.positionAt(match.index + prefixLength),
       document.positionAt(match.index + match[0].length)
@@ -60,7 +59,7 @@ async function pushImportLinks(
   }
 }
 
-export function pushCSSLinks(
+function pushCSSLinks(
   prefixs: string,
   text: string,
   map: Record<string, string>,

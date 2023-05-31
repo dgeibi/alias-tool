@@ -2,7 +2,8 @@
 
 ## Features
 
-support alias `@import "path";` for scss files
+1. scss: `@import "path";`  `@use "path";`  `url(...) ` alias
+2. js / ts: `import "path"` asset alias and fix path with search
 
 ## Extension Settings
 

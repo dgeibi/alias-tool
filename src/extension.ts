@@ -3,23 +3,50 @@
 import * as vscode from 'vscode';
 import { SCSSImportDefinitionProvider } from './SCSSImportDefinitionProvider';
 import { SCSSDocumentLinkProvider } from './SCSSDocumentLinkProvider';
+import { JSDocumentLinkProvider } from './JSDocumentLinkProvider';
 
 export function activate(context: vscode.ExtensionContext) {
-  const selector: vscode.DocumentSelector = {
+  const scssSelector: vscode.DocumentSelector = {
     scheme: 'file',
     language: 'scss',
   };
-  const provider = new SCSSImportDefinitionProvider();
   context.subscriptions.push(
-    vscode.languages.registerDefinitionProvider(selector, provider)
+    vscode.languages.registerDefinitionProvider(
+      scssSelector,
+      new SCSSImportDefinitionProvider()
+    )
+  );
+  context.subscriptions.push(
+    vscode.languages.registerDocumentLinkProvider(
+      scssSelector,
+      new SCSSDocumentLinkProvider()
+    )
   );
 
-  const linkProvider = new SCSSDocumentLinkProvider();
-  const registration = vscode.languages.registerDocumentLinkProvider(
-    selector,
-    linkProvider
+  const jsSelector: vscode.DocumentSelector = [
+    {
+      scheme: 'file',
+      language: 'javascript',
+    },
+    {
+      scheme: 'file',
+      language: 'typescript',
+    },
+    {
+      scheme: 'file',
+      language: 'javascriptreact',
+    },
+    {
+      scheme: 'file',
+      language: 'typescriptreact',
+    },
+  ];
+  context.subscriptions.push(
+    vscode.languages.registerDocumentLinkProvider(
+      jsSelector,
+      new JSDocumentLinkProvider()
+    )
   );
-  context.subscriptions.push(registration);
 }
 
 // This method is called when your extension is deactivated
