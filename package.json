@@ -54,6 +54,18 @@
     "definitionProvider": [
       {
         "language": "scss"
+      },
+      {
+        "language": "typescript"
+      },
+      {
+        "language": "javascript"
+      },
+      {
+        "language": "typescriptreact"
+      },
+      {
+        "language": "javascriptreact"
       }
     ],
     "configuration": {

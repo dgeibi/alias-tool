@@ -3,7 +3,7 @@
 import * as vscode from 'vscode';
 import { SCSSImportDefinitionProvider } from './SCSSImportDefinitionProvider';
 import { SCSSDocumentLinkProvider } from './SCSSDocumentLinkProvider';
-import { JSDocumentLinkProvider } from './JSDocumentLinkProvider';
+import { JSDocumentLinkProvider } from './JSDefinitionProvider';
 
 export function activate(context: vscode.ExtensionContext) {
   const scssSelector: vscode.DocumentSelector = {
@@ -42,7 +42,7 @@ export function activate(context: vscode.ExtensionContext) {
     },
   ];
   context.subscriptions.push(
-    vscode.languages.registerDocumentLinkProvider(
+    vscode.languages.registerDefinitionProvider(
       jsSelector,
       new JSDocumentLinkProvider()
     )
