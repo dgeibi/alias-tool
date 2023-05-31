@@ -2,7 +2,7 @@
 // Import the module and reference it with the alias vscode in your code below
 import * as vscode from 'vscode';
 import { SCSSImportDefinitionProvider } from './SCSSImportDefinitionProvider';
-import { CustomDocumentLinkProvider } from './CustomDocumentLinkProvider';
+import { SCSSDocumentLinkProvider } from './SCSSDocumentLinkProvider';
 
 export function activate(context: vscode.ExtensionContext) {
   const selector: vscode.DocumentSelector = {
@@ -14,7 +14,7 @@ export function activate(context: vscode.ExtensionContext) {
     vscode.languages.registerDefinitionProvider(selector, provider)
   );
 
-  const linkProvider = new CustomDocumentLinkProvider();
+  const linkProvider = new SCSSDocumentLinkProvider();
   const registration = vscode.languages.registerDocumentLinkProvider(
     selector,
     linkProvider
