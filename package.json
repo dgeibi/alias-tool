@@ -2,7 +2,7 @@
   "name": "alias-tool",
   "displayName": "alias-tool",
   "description": "",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "publisher": "dgeibi",
   "engines": {
     "vscode": "^1.78.0"

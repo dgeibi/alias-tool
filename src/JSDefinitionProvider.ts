@@ -4,28 +4,7 @@ import { getMappings } from "./getMappings";
 import { escapeStringRegexp } from "./escapeStringRegexp";
 import { fileExists } from "./fileExists";
 
-export class JSDocumentLinkProvider implements vscode.DefinitionProvider {
-  async provideDocumentLinks(
-    document: vscode.TextDocument
-  ): Promise<vscode.DocumentLink[]> {
-    const links: vscode.DocumentLink[] = [];
-    const workspaceFolder = vscode.workspace.getWorkspaceFolder(document.uri);
-    if (!workspaceFolder) {
-      return links;
-    }
-    const text = document.getText();
-    const config = getMappings(document);
-    await pushAliasImport(
-      /(\bimport\s*.+\s*\bfrom\b\s*|\bimport\s*)['"](.+?)['"]/g,
-      config,
-      text,
-      document,
-      links,
-      workspaceFolder
-    );
-    return links;
-  }
-
+export class JSDefinitionProvider implements vscode.DefinitionProvider {
   async provideDefinition(
     document: vscode.TextDocument,
     position: vscode.Position,
@@ -58,48 +37,6 @@ export class JSDocumentLinkProvider implements vscode.DefinitionProvider {
     if (targetUri) {
       const range = new vscode.Range(0, 0, 0, 0);
       return new vscode.Location(targetUri, range);
-    }
-  }
-}
-
-async function pushAliasImport(
-  regex: RegExp,
-  config: {
-    map: Record<string, string>;
-    array: {
-      prefix: string;
-      target: string;
-    }[];
-  },
-  text: string,
-  document: vscode.TextDocument,
-  links: vscode.DocumentLink[],
-  workspaceFolder: vscode.WorkspaceFolder
-) {
-  let match: RegExpExecArray | null;
-  const prefixRegExp = getPrefixRegExp(config);
-  while ((match = regex.exec(text)) !== null) {
-    const importPath = match[2];
-    if (isIgnore(importPath)) {
-      continue;
-    }
-
-    const targetPath = await resolve(
-      importPath,
-      prefixRegExp,
-      config.map,
-      document,
-      workspaceFolder
-    );
-
-    if (targetPath) {
-      const prefixLength = match[1].length;
-      const range = new vscode.Range(
-        document.positionAt(match.index + prefixLength),
-        document.positionAt(match.index + match[0].length)
-      );
-      const link = new vscode.DocumentLink(range, targetPath);
-      links.push(link);
     }
   }
 }
