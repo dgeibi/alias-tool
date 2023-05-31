@@ -29,7 +29,8 @@
       {
         "id": "javascript",
         "extensions": [
-          ".js"
+          ".js",
+          ".mjs"
         ]
       },
       {
