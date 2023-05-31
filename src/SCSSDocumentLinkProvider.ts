@@ -34,7 +34,7 @@ async function pushImportLinks(
   let match: RegExpExecArray | null;
 
   while ((match = regex.exec(text)) !== null) {
-    const importPath = match[1];
+    const importPath = match[1].replace(/\?.*/, '');
     const pre = match[2];
     const target = map[pre];
     const prefix = /@import\s+/.exec(match[0]);
@@ -70,7 +70,7 @@ export function pushCSSLinks(
   const regex = new RegExp(`url\\(['"]?((${prefixs})\/.+?)['"]?\\)`, 'g');
   let match: RegExpExecArray | null;
   while ((match = regex.exec(text)) !== null) {
-    const importPath = match[1];
+    const importPath = match[1].replace(/\?.*/, '');
     const pre = match[2];
     const target = map[pre];
     const prefixLength = 4;
