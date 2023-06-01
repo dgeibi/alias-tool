@@ -2,7 +2,7 @@
   "name": "alias-tool",
   "displayName": "alias-tool",
   "description": "",
-  "version": "0.1.5",
+  "version": "0.1.6",
   "icon": "icon.jpeg",
   "publisher": "dgeibi",
   "engines": {
@@ -89,7 +89,7 @@
   },
   "scripts": {
     "vscode:prepublish": "pnpm run compile",
-    "compile": "tsc -p ./",
+    "compile": "rimraf out && tsc -p ./",
     "watch": "tsc -watch -p ./",
     "pretest": "pnpm run compile && pnpm run lint",
     "lint": "eslint src --ext ts",
@@ -106,6 +106,7 @@
     "eslint": "^8.39.0",
     "glob": "^8.1.0",
     "mocha": "^10.2.0",
+    "rimraf": "^5.0.1",
     "typescript": "^5.0.4"
   },
   "dependencies": {
