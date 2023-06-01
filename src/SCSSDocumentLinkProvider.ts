@@ -3,12 +3,17 @@ import { Utils, URI } from 'vscode-uri';
 import { getMappings } from './getMappings';
 import { resolveSCSS } from './resolveSCSS';
 import { escapeStringRegexp } from './escapeStringRegexp';
+import { fileExists } from './fileExists';
 
 export class SCSSDocumentLinkProvider implements vscode.DocumentLinkProvider {
   async provideDocumentLinks(
     document: vscode.TextDocument
   ): Promise<vscode.DocumentLink[]> {
     const links: vscode.DocumentLink[] = [];
+    const workspaceFolder = vscode.workspace.getWorkspaceFolder(document.uri);
+    if (!workspaceFolder) {
+      return links;
+    }
     const text = document.getText();
     const { array: mappings, map } = getMappings(document);
     if (mappings.length === 0) {
@@ -17,8 +22,12 @@ export class SCSSDocumentLinkProvider implements vscode.DocumentLinkProvider {
     const prefixs = mappings
       .map((item) => escapeStringRegexp(item.prefix))
       .join('|');
-    pushCSSLinks(prefixs, text, map, document, links);
-    await pushImportLinks(prefixs, text, map, document, links);
+
+    await Promise.all([
+      pushCSSLinks(prefixs, text, map, document, links, workspaceFolder),
+      pushImportLinks(prefixs, text, map, document, links, workspaceFolder),
+    ]);
+
     return links;
   }
 }
@@ -28,11 +37,15 @@ async function pushImportLinks(
   text: string,
   map: Record<string, string>,
   document: vscode.TextDocument,
-  links: vscode.DocumentLink[]
+  links: vscode.DocumentLink[],
+  workspaceFolder: vscode.WorkspaceFolder
 ) {
-  const regex = new RegExp(`(@(?:import|use)\\s+)['"]((${prefixs})\/.+?)['"]`, 'g');
+  const regex = new RegExp(
+    `(@(?:import|use)\\s+)['"]((${prefixs})\/.+?)['"]`,
+    'g'
+  );
   let match: RegExpExecArray | null;
-
+  const todos: Array<() => Promise<void>> = [];
   while ((match = regex.exec(text)) !== null) {
     const importPath = match[2].replace(/\?.*/, '');
     const pre = match[3];
@@ -42,8 +55,8 @@ async function pushImportLinks(
       document.positionAt(match.index + prefixLength),
       document.positionAt(match.index + match[0].length)
     );
-    const workspaceFolder = vscode.workspace.workspaceFolders?.[0];
-    if (workspaceFolder) {
+
+    todos.push(async () => {
       const targetPath = await resolveSCSS(
         Utils.joinPath(
           workspaceFolder.uri,
@@ -55,19 +68,25 @@ async function pushImportLinks(
         const link = new vscode.DocumentLink(range, URI.parse(targetPath));
         links.push(link);
       }
-    }
+    });
+  }
+
+  if (todos.length) {
+    await Promise.all(todos.map((fn) => fn()));
   }
 }
 
-function pushCSSLinks(
+async function pushCSSLinks(
   prefixs: string,
   text: string,
   map: Record<string, string>,
   document: vscode.TextDocument,
-  links: vscode.DocumentLink[]
+  links: vscode.DocumentLink[],
+  workspaceFolder: vscode.WorkspaceFolder
 ) {
   const regex = new RegExp(`url\\(['"]?((${prefixs})\/.+?)['"]?\\)`, 'g');
   let match: RegExpExecArray | null;
+  const todos: Array<() => Promise<void>> = [];
   while ((match = regex.exec(text)) !== null) {
     const importPath = match[1].replace(/\?.*/, '');
     const pre = match[2];
@@ -77,15 +96,19 @@ function pushCSSLinks(
       document.positionAt(match.index + prefixLength),
       document.positionAt(match.index + match[0].length - 1)
     );
-    const workspaceFolder = vscode.workspace.workspaceFolders?.[0];
-    if (workspaceFolder) {
-      const targetPath = Utils.joinPath(
-        workspaceFolder.uri,
-        target,
-        importPath.replace(pre, '')
-      );
-      const link = new vscode.DocumentLink(range, targetPath);
-      links.push(link);
-    }
+    const targetPath = Utils.joinPath(
+      workspaceFolder.uri,
+      target,
+      importPath.replace(pre, '')
+    );
+    todos.push(async () => {
+      if (await fileExists(targetPath.toString(true))) {
+        const link = new vscode.DocumentLink(range, targetPath);
+        links.push(link);
+      }
+    });
+  }
+  if (todos.length) {
+    await Promise.all(todos.map((fn) => fn()));
   }
 }
