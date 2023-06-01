@@ -2,8 +2,9 @@
 
 ## Features
 
-1. scss: `@import "path";`  `@use "path";`  `url(...) ` alias
-2. js / ts: `import "path"` asset alias and fix path with search
+1. scss: `@import "@alias/path";` , `@use "@alias/path";` and `url(@alias/path.png) ` go to definition / link
+2. js / ts: `import "@alias/path.png"` go to definition
+3. fix `.png?query` go to definition
 
 ## Extension Settings
 
@@ -12,9 +13,24 @@
 ```
 {
     "alias-tool.mappings": {
-        "app": "frontend/app",
-        "@client": "frontend/app",
-        "~@client": "frontend/app"
+        "app": "${folder}/frontend/app",
+        "@client": "${folder}/frontend/app",
+        "~@client": "${folder}/frontend/app"
     }
 }
 ```
+
+Supported variables:
+
+| Name | Description |
+|------|-------------|
+| `${folder}` | The root folder of the current file |
+| `${workspace}` | The root folder of the current workspace |
+
+## See also
+
+- use [Path Autocomplete](https://marketplace.visualstudio.com/items?itemName=ionutvmi.path-autocomplete) for autocomplete
+
+## Acknowledgements
+
+- https://github.com/mihai-vlc/path-autocomplete
