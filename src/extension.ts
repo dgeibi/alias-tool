@@ -4,6 +4,7 @@ import * as vscode from 'vscode';
 import { SCSSImportDefinitionProvider } from './SCSSImportDefinitionProvider';
 import { SCSSDocumentLinkProvider } from './SCSSDocumentLinkProvider';
 import { CSSDocumentLinkProvider } from './CSSDocumentLinkProvider';
+import { CSSImportDefinitionProvider } from './CSSImportDefinitionProvider';
 import { JSDefinitionProvider } from './JSDefinitionProvider';
 
 export function activate(context: vscode.ExtensionContext) {
@@ -23,12 +24,18 @@ export function activate(context: vscode.ExtensionContext) {
       new SCSSDocumentLinkProvider()
     )
   );
+
+  const cssSelector = {
+    scheme: 'file',
+    language: 'css',
+  };
   context.subscriptions.push(
+    vscode.languages.registerDefinitionProvider(
+      cssSelector,
+      new CSSImportDefinitionProvider()
+    ),
     vscode.languages.registerDocumentLinkProvider(
-      {
-        scheme: 'file',
-        language: 'css',
-      },
+      cssSelector,
       new CSSDocumentLinkProvider()
     )
   );

@@ -29,7 +29,7 @@ function toPathVariations(target: string): string[] {
   ];
 }
 
-export async function resolveSCSS(path: string) {
+export async function getRealSCSSPath(path: string) {
   for (const variation of toPathVariations(path)) {
     if (await fileExists(variation)) {
       return variation;

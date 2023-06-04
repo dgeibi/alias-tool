@@ -5,6 +5,7 @@ import { escapeStringRegexp } from './escapeStringRegexp';
 import { fileExists } from './fileExists';
 import { resolveAliasTarget } from './resolveAliasTarget';
 import { normalizeImportPath } from './normalizeImportPath';
+import { getRealSCSSPath } from './getRealSCSSPath';
 
 function isWithSearch(importPath: string) {
   return importPath.includes('?') && importPath[0] === '.';
@@ -39,10 +40,18 @@ const getPrefixRegExp = (
   return ret;
 };
 
+async function defaultResolver(path: string) {
+  if (path && (await fileExists(path))) {
+    return URI.parse(path);
+  }
+  return null;
+}
+
 export async function resolveAsset(
   importPath: string,
   config: Configuration,
-  document: vscode.TextDocument
+  document: vscode.TextDocument,
+  resolver = defaultResolver
 ) {
   const prefixRegExp = getPrefixRegExp(config.array);
   let targetUri: URI | null = null;
@@ -65,8 +74,22 @@ export async function resolveAsset(
       normalizeImportPath(importPath)
     );
   }
-  if (targetUri && (await fileExists(targetUri.toString(true)))) {
-    return targetUri;
+  if (targetUri) {
+    targetUri = await resolver(targetUri.toString(true));
   }
-  return null;
+  return targetUri;
+}
+
+export function resolveSCSS(
+  importPath: string,
+  config: Configuration,
+  document: vscode.TextDocument
+) {
+  return resolveAsset(importPath, config, document, async (path) => {
+    const fileUri = await getRealSCSSPath(path);
+    if (fileUri) {
+      return URI.parse(fileUri);
+    }
+    return null;
+  });
 }

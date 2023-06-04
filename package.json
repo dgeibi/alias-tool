@@ -2,7 +2,7 @@
   "name": "alias-tool",
   "displayName": "alias-tool",
   "description": "",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "icon": "icon.jpeg",
   "publisher": "dgeibi",
   "engines": {
@@ -61,6 +61,9 @@
       }
     ],
     "definitionProvider": [
+      {
+        "language": "css"
+      },
       {
         "language": "scss"
       },

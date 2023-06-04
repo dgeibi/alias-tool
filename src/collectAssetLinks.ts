@@ -1,34 +1,39 @@
 import * as vscode from 'vscode';
 import { type Configuration } from './getConfig';
-import { resolveAsset } from './resolveAsset';
+import { collectImportPaths } from './collectImportPaths';
+import { URI } from 'vscode-uri';
 
 export async function collectAssetLinks(
   regex: RegExp,
   text: string,
   document: vscode.TextDocument,
   links: vscode.DocumentLink[],
-  config: Configuration
+  config: Configuration,
+  ignoreImportPath?: (path: string) => boolean,
+  resolve?: (
+    importPath: string,
+    config: Configuration,
+    document: vscode.TextDocument,
+    resolver?: (path: string) => Promise<URI | null>
+  ) => Promise<URI | null>
 ) {
-  let match: RegExpExecArray | null;
-  const todos: Array<() => Promise<void>> = [];
-  while ((match = regex.exec(text)) !== null) {
-    const { index, 0: match0, 1: prefix, 2: importPath, 3: suffix } = match;
-    if (!importPath.includes('.')) {
-      continue;
-    }
-    todos.push(async () => {
-      const targetUri = await resolveAsset(importPath, config, document);
-      if (targetUri) {
-        const range = new vscode.Range(
-          document.positionAt(index + prefix.length),
-          document.positionAt(index + match0.length - (suffix?.length || 0))
-        );
-        const link = new vscode.DocumentLink(range, targetUri);
-        links.push(link);
-      }
-    });
-  }
-  if (todos.length) {
-    await Promise.all(todos.map((fn) => fn()));
-  }
+  const pathInfos = await collectImportPaths(
+    regex,
+    text,
+    document,
+    config,
+    ignoreImportPath,
+    resolve
+  );
+  pathInfos.forEach((item) => {
+    links.push(
+      new vscode.DocumentLink(
+        new vscode.Range(
+          document.positionAt(item.range[0]),
+          document.positionAt(item.range[1])
+        ),
+        item.uri
+      )
+    );
+  });
 }
