@@ -2,9 +2,10 @@
 
 ## Features
 
-1. scss: `@import "@alias/path";` , `@use "@alias/path";` and `url(@alias/path.png) ` go to definition / link
-2. js / ts: `import "@alias/path.png"` go to definition
-3. fix `.png?query` go to definition
+1. scss: `@import "@alias/path";` , `@use "@alias/path";` and `url(@alias/path.png) ` go to definition / links
+2. css: `@import "@alias/path";` and `url(@alias/path.png) ` links
+3. js / ts: `import "@alias/path.png"` go to definition
+4. fix `.png?query` go to definition
 
 ## Extension Settings
 

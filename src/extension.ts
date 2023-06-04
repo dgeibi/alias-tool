@@ -3,6 +3,7 @@
 import * as vscode from 'vscode';
 import { SCSSImportDefinitionProvider } from './SCSSImportDefinitionProvider';
 import { SCSSDocumentLinkProvider } from './SCSSDocumentLinkProvider';
+import { CSSDocumentLinkProvider } from './CSSDocumentLinkProvider';
 import { JSDefinitionProvider } from './JSDefinitionProvider';
 
 export function activate(context: vscode.ExtensionContext) {
@@ -20,6 +21,15 @@ export function activate(context: vscode.ExtensionContext) {
     vscode.languages.registerDocumentLinkProvider(
       scssSelector,
       new SCSSDocumentLinkProvider()
+    )
+  );
+  context.subscriptions.push(
+    vscode.languages.registerDocumentLinkProvider(
+      {
+        scheme: 'file',
+        language: 'css',
+      },
+      new CSSDocumentLinkProvider()
     )
   );
 

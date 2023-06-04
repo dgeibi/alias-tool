@@ -5,7 +5,7 @@ import { resolveSCSS } from './resolveSCSS';
 import { escapeStringRegexp } from './escapeStringRegexp';
 import { resolveAliasTarget } from './resolveAliasTarget';
 import { normalizeImportPath } from './normalizeImportPath';
-import { resolveAsset } from './resolveAsset';
+import { collectAssetLinks } from './collectAssetLinks';
 
 export class SCSSDocumentLinkProvider implements vscode.DocumentLinkProvider {
   async provideDocumentLinks(
@@ -16,7 +16,13 @@ export class SCSSDocumentLinkProvider implements vscode.DocumentLinkProvider {
     const config = getConfig(document);
 
     await Promise.all([
-      pushAssetLinks(text, document, links, config),
+      collectAssetLinks(
+        /(url\(\s*)['"]?(.+?)['"]?(\s*\))/g,
+        text,
+        document,
+        links,
+        config
+      ),
       pushImportLinks(text, document, links, config),
     ]);
 
@@ -68,39 +74,6 @@ async function pushImportLinks(
     });
   }
 
-  if (todos.length) {
-    await Promise.all(todos.map((fn) => fn()));
-  }
-}
-
-async function pushAssetLinks(
-  text: string,
-  document: vscode.TextDocument,
-  links: vscode.DocumentLink[],
-  config: Configuration
-) {
-  const regex = /url\(\s*['"]?(.+?)['"]?\s*\)/g;
-  let match: RegExpExecArray | null;
-  const todos: Array<() => Promise<void>> = [];
-  while ((match = regex.exec(text)) !== null) {
-    const { index, 0: match0, 1: importPath } = match;
-    if (!importPath.includes('.')) {
-      continue;
-    }
-    todos.push(async () => {
-      const targetUri = await resolveAsset(importPath, config, document);
-      if (targetUri) {
-        const prefixLength = 4;
-        const range = new vscode.Range(
-          document.positionAt(index + prefixLength),
-          document.positionAt(index + match0.length - 1)
-        );
-
-        const link = new vscode.DocumentLink(range, targetUri);
-        links.push(link);
-      }
-    });
-  }
   if (todos.length) {
     await Promise.all(todos.map((fn) => fn()));
   }

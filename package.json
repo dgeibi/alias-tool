@@ -2,7 +2,7 @@
   "name": "alias-tool",
   "displayName": "alias-tool",
   "description": "",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "icon": "icon.jpeg",
   "publisher": "dgeibi",
   "engines": {
@@ -13,6 +13,7 @@
   ],
   "activationEvents": [
     "onLanguage:scss",
+    "onLanguage:css",
     "onLanguage:typescript",
     "onLanguage:javascript",
     "onLanguage:typescriptreact",
@@ -21,6 +22,12 @@
   "main": "./out/extension.js",
   "contributes": {
     "languages": [
+      {
+        "id": "css",
+        "extensions": [
+          ".css"
+        ]
+      },
       {
         "id": "scss",
         "extensions": [
@@ -93,7 +100,8 @@
     "watch": "tsc -watch -p ./",
     "pretest": "pnpm run compile && pnpm run lint",
     "lint": "eslint src --ext ts",
-    "test": "node ./out/test/runTest.js"
+    "test": "node ./out/test/runTest.js",
+    "prettier": "prettier --write ./src"
   },
   "devDependencies": {
     "@types/glob": "^8.1.0",
@@ -106,6 +114,7 @@
     "eslint": "^8.39.0",
     "glob": "^8.1.0",
     "mocha": "^10.2.0",
+    "prettier": "^2.8.8",
     "rimraf": "^5.0.1",
     "typescript": "^5.0.4"
   },
